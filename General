@@ -1,0 +1,67 @@
+import sys
+#Create the name of the file
+temp = sys.argv[1].split(',')
+namePrefix = temp[0]+"Distance"+ temp[1] + "-Density" + temp[2] 
+
+#Extract the packets received from the .sca file
+
+list1 = []
+for i in range (1,6):
+    name= namePrefix + "-" + str(i) + "-0.sca"
+    print name
+    f = open(name, 'r')
+    temp = f.readlines()    
+    done = 0
+    j = 0
+    index = ""
+    uno = 0
+    dos= 0
+    while (j<len(temp) and done == 0):
+        #line = f.readline()
+        fields = temp[j].split()
+        if "Vanet.rsu[0].wlan[1].mac" in temp[j] and "sentWithoutRetry" in temp[j]:
+            print fields[5]
+			
+            uno = int(fields[5])
+        if "Vanet.rsu[1].wlan[1].mac" in temp[j] and "sentWithoutRetry" in temp[j]:
+            print fields[5]
+            dos = int(fields[5])
+            list1.append(uno+dos)
+            done = 1
+        j=j+1
+    f.close()
+print(list1)
+
+
+
+#Extract the packets sent from the .sca file
+
+list2 = []
+for i in range (1,6):
+    name= namePrefix + "-" + str(i) + "-0.sca"
+    #print name
+    f = open(name, 'r')
+    temp = f.readlines()
+    done = 0
+    j = 0
+    index = ""
+    while (j<len(temp) and done == 0):       
+        fields = temp[j].split()
+        if "Vanet.externalNode.app" in temp[j] and "pktSent:sum" in temp[j]:
+           # print fields[3]
+            list2.append(fields[3])
+            done=1
+        
+        j=j+1
+    f.close()
+print(list2)
+#Write the contents in a .txt file
+
+nameOutput = "Throughtput2-"+ namePrefix + ".txt"
+fw = open(nameOutput, 'w')
+i = 0
+for item in list1:
+    fw.write('{0} {1}\n'.format(item, list2[i]))
+    i = i+1
+fw.close()
+
